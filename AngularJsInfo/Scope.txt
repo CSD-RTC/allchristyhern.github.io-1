@@ -1,0 +1,73 @@
+﻿What Can Scopes Do?
+	Scopes have the following basic functions:
+	• They provide observers to watch for model changes
+	• They provide the ability to propagate model changes through the application as well as outside
+	the system to other components
+	• They can be nested such that they can isolate functionality and model properties
+	• They provide an execution environment in which expressions are evaluated
+	The majority of the work we’ll do in developing our Angular app is building out the functionality
+	of a scope.
+	Scopes are objects that contain functionality and data to use when rendering the view.
+	It is the single source of truth for all views. You can think of scopes as view models.
+Example:
+set a variable name on the $rootScope and reference it in a view, like
+so:
+angular.module('myApp', [])
+.run(function($rootScope) {
+$rootScope.name = "World";
+});
+And our view can now reference this name property to show to the user:
+Scopes 23
+<div ng-app="myApp">
+<h1>Hello {{ name }}</h1>
+</div>
+Instead of placing variables on the $rootScope, we can explicitly create a child $scope object using
+a controller. We can attach a controller object to a DOM element using the ng-controller directive
+on a DOM element, like so:
+<div ng-app="myApp">
+<div ng-controller="MyController">
+<h1>Hello {{ name }}</h1>
+</div>
+</div>
+Now, instead of attaching the name variable on the $rootScope, we can create a controller that will
+manage our variable:
+angular.module("myApp", [])
+.controller('MyController',
+function($scope) {
+$scope.name = "Ari";
+});
+The ng-controller directive creates a new $scope object for the DOM element and nests it in the
+containing $rootScope.
+$scope Lifecycle
+When the browser receives a JavaScript callback that executes inside of the Angular execution
+context (for more information on the Angular execution context, check out the digest loop chapter),
+the $scope will be made aware of the model mutation.
+If the callback executes outside of the Angular context, we can force the $scope to have
+knowledge of the change using the $apply method.
+After the scope expression is evaluated and the $digest loop runs, the $scope’s watch expressions
+will run dirty checking (see the digest loop for more details on dirty checking).
+We’ll dive deep into expressions in the Expressions chapter. The scope’s expression is
+whatever we set the scope variable. When we set the scope name above, we’re setting
+it to an expression: $scope.name = "Ari", even if it’s just a string.
+
+Creation
+	When we create a controller or directive, Angular creates a new scope with the $injector and passes
+	this new scope for the controller or directive at runtime.
+Linking
+	When the $scope is linked to the view, all directives that create $scopes will register their watches
+	on the parent scope. These watches watch for and propagate model changes from the view to the
+	directive.
+Updating
+	During the $digest cycle, which executes on the $rootScope, all of the children scopes will perform
+	dirty digest checking. All of the watching expressions are checked for any changes, and the scope
+	calls the listener callback when they are changed.
+Destruction
+	When a $scope is no longer needed, the child scope creator will need to call scope.$destroy() to
+	clean up the child scope.
+	Note that when a scope is destroyed, the $destroy event will be broadcasted.
+
+Directives and Scopes
+	Directives, which are used all throughout our Angular apps, generally do not create their own
+	$scopes, but there are cases when they do. For instance, the ng-controller and ng-repeat directives
+	create their own child scopes and attach them to the DOM element.
+	

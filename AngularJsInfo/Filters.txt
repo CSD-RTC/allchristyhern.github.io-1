@@ -1,0 +1,244 @@
+﻿In AngularJS, a filter provides a way to format the data we display to the user. Angular gives us
+several built-in filters as well as an easy way to create our own.
+We invoke filters in our HTML with the | (pipe) character inside the template binding characters {{
+}}. For instance, let’s say we want to capitalize our string. We can either change all the characters
+in a string to be capitalized, or we can use a filter.
+{{ name | uppercase }}
+We can also use filters from within JavaScript by using the $filter service. For instance, to use the
+lowercase JavaScript filter:
+app.controller('DemoController', ['$scope', '$filter',
+function($scope, $filter) {
+$scope.name = $filter('lowercase')('Ari');
+}]);
+To pass an argument to a filter in the HTML form, we pass it with a colon after the filter name (for
+multiple arguments, we can simply append a colon after each argument). For example, the number
+filter allows us to limit the number of decimal places a number can show. To pass the argument 2,
+we’ll append :2 to the number filter:
+<!-- Displays: 123.46 -->
+{{ 123.456789 | number:2 }}
+We can use multiple filters at the same time by using two or more pipes. We’ll see such an example
+in a minute when we build a custom filter. Before we get to that, however, let’s look at the built-in
+filters that come out of the box with AngularJS.
+currency
+The currency filter formats a number as currency. In other words, 123 as currency looks like: {{ 123
+| currency }}.
+Currency gives us the option of displaying a currency symbol or identifier. The default currency
+option is that of the current locale; however, we can pass in a currency to display.
+Filters 38
+date
+The date filter allows us to format a date based upon a requested format style. The date formatter
+provides us several built-in options. If no date format is passed, then it defaults to showing
+mediumDate (as you can see below).
+Here are the built-in localizable formats:
+{{ today | date:'medium' }} <!-- Aug 09, 2013 12:09:02 PM -->
+{{ today | date:'short' }} <!-- 8/9/13 12:09 PM -->
+{{ today | date:'fullDate' }} <!-- Thursday, August 09, 2013 -->
+{{ today | date:'longDate' }} <!-- August 09, 2013 -->
+{{ today | date:'mediumDate' }} <!-- Aug 09, 2013 -->
+{{ today | date:'shortDate' }} <!-- 8/9/13 -->
+{{ today | date:'mediumTime' }} <!-- 12:09:02 PM -->
+{{ today | date:'shortTime' }} <!-- 12:09 PM -->
+The date formatter also enables us to customize your date format to our own liking. We can combine
+and chain together these format options to create one single date format, as well:
+Year Formatting
+Four-digit year: {{ today | date:'yyyy' }} <!-- 2013 -->
+Two-digit padded year: {{ today | date:'yy' }} <!-- 13 -->
+One-digit year: {{ today | date:'y' }} <!-- 2013 -->
+Month Formatting
+Month in year: {{ today | date:'MMMM' }} <!-- August -->
+Short month in year: {{ today | date:'MMM' }} <!-- Aug -->
+Padded month in year: {{ today | date:'MM' }} <!-- 08 -->
+Month in year: {{ today | date:'M' }} <!-- 8 -->
+Day Formatting
+Padded day in month: {{ today | date:'dd' }} <!-- 09 -->
+Day in month: {{ today | date:'d' }} <!-- 9 -->
+Day in week: {{ today | date:'EEEE' }} <!-- Thursday -->
+Short day in week: {{ today | date:'EEE' }} <!-- Thu -->
+Hour Formatting
+Filters 39
+Padded hour in day: {{ today | date:'HH' }} <!-- 00 -->
+Hour in day: {{ today | date:'H' }} <!-- 0 -->
+Padded hour in am/pm: {{ today | date:'hh' }} <!-- 12 -->
+Hour in am/pm: {{ today | date:'h' }} <!-- 12 -->
+Minute Formatting
+Padded minute in hour: {{ today | date:'mm' }} <!-- 09 -->
+Minute in hour: {{ today | date:'m' }} <!-- 9 -->
+Second Formatting
+Padded second in minute: {{ today | date:'ss' }} <!-- 02 -->
+Second in minute: {{ today | date:'s' }} <!-- 2 -->
+Padded millisecond in second: {{ today | date:'.sss' }} <!-- .995 -->
+String Formatting
+am/pm character: {{ today | date:'a' }} <!-- AM -->
+4-digit representation of time zone offset: {{ today | date:'Z' }} <!-- -0700 -->
+Some examples of custom date formatting:
+{{ today | date:'MMM d, y' }} <!-- Aug 09, 2013 -->
+{{ today | date:'EEEE, d, M' }} <!-- Thursday, 9, 8 -->
+{{ today | date:'hh:mm:ss.sss' }} <!-- 12:09:02.995 -->
+filter
+The filter filter selects a subset of items from an array of items and returns a new array. This
+filter is generally used as a way to filter out items for display. For instance, when using client-side
+searching, we can filter out items from an array immediately.
+The filter method takes a string, object, or function that it will run to select or reject array elements.
+If the first parameter passed in is a:
+string
+It will accept all elements that match against the string. If we want all the elements that do not
+match the string, we can prepend a ! to the string.
+Filters 40
+object
+It will compare objects that have a property name that matches, as with the simple substring match
+if only a string is passed in. If we want to match against all properties, we can use the $ as the key.
+function
+It will run the function over each element of the array, and the results that return as non-falsy will
+appear in the new array.
+For instance, selecting all of the words that have the letter e in them, we could run our filter like so:
+{{ ['Ari', 'Lerner', 'Likes', 'To', 'Eat', 'Pizza'] | filter:'e' }}
+<!-- ["Lerner","Likes","Eat"] -->
+If we want to filter on objects, we can use the the object filter notation as we discussed above. For
+instance, if we have an array of people objects with a list of their favorite foods, we could filter them
+like so:
+{{ [{
+'name': 'Ari',
+'City': 'San Francisco',
+'favorite food': 'Pizza'
+}, {
+'name': 'Nate',
+'City': 'San Francisco',
+'favorite food': 'indian food'
+}] | filter:{'favorite food': 'Pizza'} }}
+<!-- [{"name":"Ari","City":"San Francisco","favorite food":"Pizza"}] -->
+We can also filter based on a function that we define (in this example, on the containing $scope
+object):
+{{ ['Ari', 'likes', 'to', 'travel'] | filter:isCapitalized }}
+<!-- ["Ari"] -->
+The isCapitalized function, which returns true if the first character is a capital letter and false if
+it is not, is defined as:
+Filters 41
+$scope.isCapitalized =
+function(str) { return str[0] == str[0].toUpperCase(); }
+We can also pass a second parameter into the filter method that will be used to determine if the
+expected value and the actual value should be considered a match.
+If the second parameter passed in is:
+true
+It runs a strict comparison of the two using angular.equals(expected, actual).
+false
+It looks for a case-insensitive substring match.
+function
+It runs the function and accepts an element if the result of the function is truthy.
+json
+The json filter will take a JSON, or JavaScript object, and turn it into a string. This transformation
+is very useful for debugging purposes:
+{{ {'name': 'Ari', 'City': 'San Francisco'} | json }}
+<!--
+{
+"name": "Ari",
+"City": "San Francisco"
+}
+-->
+limitTo
+The limitTo filter creates a new array or string that contains only the specified number of elements,
+either taken from the beginning or end, depending on whether the value is positive or negative.
+If the limit exceeds the value of the string, then the entire array or string will be returned.
+For instance, we can take the first three letters of a string:
+Filters 42
+{{ San Francisco is very cloudy | limitTo:3 }}
+<!-- San -->
+Or we can take the last 6 characters of a string:
+{{ San Francisco is very cloudy | limitTo:-6 }}
+<!-- cloudy -->
+We can do the same with an array. Here we’ll return only the first element of the array:
+{{ ['a', 'b', 'c', 'd', 'e', 'f'] | limitTo:1 }}
+<!-- ["a"] -->
+lowercase
+The lowercase filter simply lowercases the entire string.
+{{ "San Francisco is very cloudy" | lowercase }}
+<!-- san francisco is very cloudy -->
+number
+The number filter formats a number as text. It can take a second parameter (optional) that will format
+the number to the specified number of decimal places (rounded).
+If a non-numeric character is given, it will return an empty string.
+{{ 123456789 | number }}
+<!-- 1,234,567,890 -->
+{{ 1.234567 | number:2 }}
+<!-- 1.23 -->
+orderBy
+The orderBy filter orders the specific array using an expression.
+The orderBy function can take two parameters: The first one is required, while the second is optional.
+The first parameter is the predicate used to determine the order of the sorted array.
+If the first parameter passed in is a(n):
+Filters 43
+function
+It will use the function as the getter function for the object.
+string
+It will parse the string and use the result as the key by which to order the elements of the array. We
+can pass either a + or a - to force the sort in ascending or descending order.
+array
+It will use the elements as predicates in the sort expression. It will use the first predicate for every
+element that is not strictly equal to the expression result.
+The second parameter controls the sort order of the array (either reversed or not).
+For instance, let’s sort an array of objects by their name. Say we have an array of people, we can
+order the array of objects with the name value:
+{{ [{
+'name': 'Ari',
+'status': 'awake'
+}, {
+'name': 'Q',
+'status': 'sleeping'
+}, {
+'name': 'Nate',
+'status': 'awake'
+}] | orderBy: 'name' }}
+<!--
+[
+{"name":"Ari","status":"awake"},
+{"name":"Nate","status":"awake"},
+{"name":"Q","status":"sleeping"}
+]
+-->
+We can also reverse-sort the object. For instance, reverse-sorting the previous object, we simply add
+the second parameter as true:
+Filters 44
+{{ [{
+'name': 'Ari',
+'status': 'awake'
+}, {
+'name': 'Q',
+'status': 'sleeping'
+}, {
+'name': 'Nate',
+'status': 'awake'
+}] | orderBy:'name':true }}
+<!--
+[
+{"name":"Q","status":"sleeping"},
+{"name":"Nate","status":"awake"},
+{"name":"Ari","status":"awake"}
+]
+-->
+uppercase
+The uppercase filter simply uppercases the entire string:
+{{ "San Francisco is very cloudy" | uppercase }}
+<!-- SAN FRANCISCO IS VERY CLOUDY -->
+Making Our Own Filter
+As we saw above, it’s really easy to create our own custom filter. To create a filter, we put it under
+its own module. Let’s create one together: a filter that capitalizes the first character of a string.
+First, we need to create it in a module that we’ll require in our app (this step is good practice):
+angular.module('myApp.filters', [])
+.filter('capitalize', function() {
+return function(input) {}
+});
+Filters are just functions to which we pass input. In the function above, we simply take the input as
+the string on which we are calling the filter. We can do some error checking inside the function:
+Filters 45
+angular.module('myApp.filters', [])
+.filter('capitalize', function() {
+return function(input) {
+// input will be the string we pass in
+if (input)
+return input[0].toUpperCase() +
+input.slice(1);
+}
+});
+Now, if we want to capitalize the first letter of a sentence, we can first lowercase the entire string
+and then capitalize the first letter with our filter:
+<!-- Ginger loves dog treats -->
+{{ 'ginger loves dog treats' | lowercase | capitalize }}
