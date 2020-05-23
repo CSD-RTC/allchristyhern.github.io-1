@@ -1,10 +1,11 @@
-          <a href="index.html">AngularJs Movie API: index.html</a>
-
 ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/allchristyhern/allchristyhern.github.io/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+
+###Navigation
+-    <a href="index.html">AngularJs Movie API: index.html</a>
 
 ### Markdown
 
