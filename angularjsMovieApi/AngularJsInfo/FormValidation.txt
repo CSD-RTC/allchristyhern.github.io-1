@@ -1,0 +1,454 @@
+﻿Form Validation
+When taking input from our users, it’s important to show visual feedback on their input. In the
+context of human relationships, form validation is just as much about giving feedback as well as
+getting the “right” input.
+Not only does it provide positive feedback for our user, it will also semi-protect our web app from
+bad or invalid input. We can only protect our back end as much as is possible with our web front
+end.
+Out of the box, AngularJS supports form validation with a mix of the HTML5 form validation inputs
+as well as with its own validation directives.
+There are many form validation directives available in AngularJS. We’ll talk about a few of the core
+validations, then we’ll get into how to build your own validations.
+<form name="form" novalidate>
+<label name="email">Your email</label>
+<input type="email" name="email" ng-model="email" placeholder="Email Address" />
+</form>
+AngularJS makes it pretty easy for us to handle client-side form validations without adding a lot of
+extra effort. Although we can’t depend on client-side validations to keep our web application secure,
+they do provide instant feedback of the state of the form.
+To use form validations, we first must ensure that the form has a name associated with it, like in the
+above example.
+
+All input fields can validate against some basic validations, like minimum length, maximum length,
+etc. These are all available on the new HTML5 attributes of a form.
+It is usually a great idea to use the novalidate flag on the form element, as it prevents the browser
+from natively validating the form.
+Let’s look at all the validation options we have that we can place on an input field:
+Required
+To validate that a form input has been filled out, we simply add the HTML5 tag, required, to the
+input field:
+<input type="text" required />
+Minimum Length
+To validate that a form input input is at least a certain {number} of characters, we add the AngularJS
+directive ng-minlength="{number}" to the input field:
+<input type="text" ng-minlength=5 />
+Maximum Length
+To validate that a form input is equal to or less than a number of characters, we can add the AngularJS
+directive ng-maxlength="{number}":
+<input type="text" ng-maxlength=20 />
+Matches a Pattern
+To ensure that an input matches a regex, we can use ng-pattern="/PATTERN/":
+<input type="text" ng-pattern="/a-zA-Z/" />
+Email
+To validate an email address in an input field, we simply set the input type to email, like so:
+
+<input type="email" name="email" ng-model="user.email" />
+Number
+To validate an input field has a number, we set the input type to number:
+<input type="number" name="age" ng-model="user.age" />
+URL
+To validate that an input represents a URL, set the input type to url:
+<input type="url" name="homepage" ng-model="user.facebook_url" />
+Custom Validations
+AngularJS makes it very easy to add our own validations, as well, by using directives. For instance,
+let’s say that we want to validate that our username is available in the database. To do so, we’ll
+implement a directive that fires an Ajax request whenever the form changes.
+angular.module('validationExample', [])
+.directive('ensureUnique', function($http) {
+return {
+require: 'ngModel',
+link: function(scope, ele, attrs, c) {
+scope.$watch(attrs.ngModel, function() {
+$http({
+method: 'POST',
+url: '/api/check/' + attrs.ensureUnique,
+data: {'field': attrs.ensureUnique}
+}).success(function(data,status,headers,cfg) {
+c.$setValidity('unique', data.isUnique);
+}).error(function(data,status,headers,cfg) {
+c.$setValidity('unique', false);
+});
+});
+}
+}
+});
+
+Control Variables in Forms
+AngularJS makes properties available on the containing $scope object available to us as a result of
+setting a form inside the DOM. These properties enable us to react to the form in real time (just like
+everything else in AngularJS). The properties that are available to us are:
+(Note that these properties are made available to us in the format:)
+formName.inputFieldName.property
+Unmodified Form
+This property is a boolean that tells us whether the user has modified the form. It is true if the user
+hasn’t touched the form, and false if they have:
+formName.inputFieldName.$pristine;
+Modified Form
+This property is a boolean that tells us if and only if the user has actually modified the form. It is
+set regardless of validations on the form:
+formName.inputFieldName.$dirty
+Valid Form
+This property is a boolean that tells us whether or not the form is valid. If the form is currently valid,
+then the following will be true:
+formName.inputFieldName.$valid
+Invalid Form
+This property is a boolean that tells us whether or not the form is invalid. If the form is currently
+invalid, then the following will be true:
+formName.inputFieldName.$invalid
+The last two properties are particularly useful for showing or hiding DOM elements. They are also
+very useful when setting a class on a particular form.
+Errors
+This property is another useful one that AngularJS makes available to us: the $error object. This
+object contains all of the validations on a particular form and a record of whether they are valid or
+invalid. To get access to this property, use the following syntax:
+
+formName.inputfieldName.$error
+If a validation fails, then this property will be true; if it is false, then the value has passed the input
+field.
+A Little Style Never Hurts
+When AngularJS is handling a form, it adds specific classes to the form based upon the current state
+of the form (i.e. if it’s currently valid, unchanged, etc.). These classes are named similarly to the
+properties that we can check, as well.
+These classes are:
+.ng-pristine {}
+.ng-dirty {}
+.ng-valid {}
+.ng-invalid {}
+They correspond to their counterpart on the particular input field.
+When a field is invalid, the .ng-invalid class will be applied to the field. This particular site sets
+the CSS class as:
+input.ng-invalid {
+border: 1px solid red;
+}
+input.ng-valid {
+border: 1px solid green;
+}
+$parsers
+When our user interacts with the controller and the $setViewValue() method has been called on
+the ngModelController, the array of $parsers functions are called as a pipeline. The first $parser
+is called and passes its value to the next, and so on and so forth.
+These functions have the opportunity to convert the value and change the validity state of the control
+by using the $setValidity() functions.
+Using the $parsers array is one way we can create a custom validation. For instance, let’s say we
+want to confirm a value is between two numbers. We’ll push a new function on the $parsers array
+that is called in the validation chain.
+The value that we return from this $parser function is the value that will be passed down the chain
+to the next parser. We return undefined if we don’t want the model to update.
+
+angular.module('myApp')
+.directive('oneToTen', function() {
+return {
+require: '?ngModel',
+link: function(scope, ele, attrs, ngModel) {
+if (!ngModel) return;
+ngModel.$parsers.unshift(
+function(viewValue) {
+var i = parseInt(viewValue);
+if (i >= 0 && i < 10) {
+ngModel.$setValidity('oneToTen', true);
+return viewValue;
+} else {
+ngModel.$setValidity('oneToTen', false);
+return undefined;
+}
+});
+}
+};
+});
+$formatters
+When the bound ngModel value has changed and has been run through the $parsers array, then
+the value will be passed through to the $formatters pipeline. These functions have the opportunity
+to modify and format the value, as well as change the validity state of the control similar to the
+$parsers array.
+We use these functions primarily to handle visual changes in the view, rather than purely for
+validation purposes. For instance, let’s say we want to call a formatter on a value. Using the
+$formatters array, we can set a filter to run on the value:
+angular.module('myApp')
+.directive('oneToTen', function() {
+return {
+require: '?ngModel',
+link: function(scope, ele, attrs, ngModel) {
+if (!ngModel) return;
+ngModel.$formatters.unshift(function(v) {
+return $filter('number')(v);
+});
+
+}
+};
+});
+Putting It All Together
+Let’s build a signup form. This signup form will include person’s name, his or her email, and a
+desired username.
+Let’s start by looking at what the form will look like when it’s done:
+Signup form
+Play with it²¹
+Let’s start by defining the form:
+<form name="signup_form" novalidate ng-submit="signupForm()">
+<fieldset>
+<legend>Signup</legend>
+<button type="submit" class="button radius">Submit</button>
+</fieldset>
+</form>
+This form’s name is signup_form, and we are going to call signupForm() when the form is submitted.
+Now, let’s add the name of the user:
+
+
+<div class="row">
+<div class="large-12 columns">
+<label>Your name</label>
+<input type="text"
+placeholder="Name"
+name="name"
+ng-model="signup.name"
+ng-minlength=3
+ng-maxlength=20 required />
+</div>
+</div>
+We’ll discuss styling in a future chapter, but we’ll include styles in this chapter as an introduction.
+We’re using the Foundation²² framework in this chapter for CSS layouts.
+We’ve added a form that has an input field called name that is bound (by ng-model) to the object
+signup.name on the $scope object.
+Don’t forget to add a name to the input field. Adding a name to the input is important:
+That is how we’ll reference the form input when showing validation messages to the user.
+We’ve also set up a few validations. These validations say we have to have a minlength of three or
+more characters in our name. We also impose a maximum limit of 20 characters (meaning the input
+will be invalid at 21 characters and higher). Lastly, we’ve required that the name be filled out for
+the form to be valid.
+Let’s use the properties to show and/or hide a list of errors if the form is invalid. We’ll use the $dirty
+attribute to make sure the errors don’t show up if the user hasn’t touched the field:
+<div class="row">
+<div class="large-12 columns">
+<label>Your name</label>
+<input type="text"
+placeholder="Name"
+name="name"
+ng-model="signup.name"
+ng-minlength=3
+ng-maxlength=20 required />
+<div class="error"
+ng-show="signup_form.name.$dirty && signup_form.name.$invalid">
+<small class="error"
+²²http://foundation.zurb.com
+
+ng-show="signup_form.name.$error.required">
+Your name is required.
+</small>
+<small class="error"
+ng-show="signup_form.name.$error.minlength">
+Your name is required to be at least 3 characters
+</small>
+<small class="error"
+ng-show="signup_form.name.$error.maxlength">
+Your name cannot be longer than 20 characters
+</small>
+</div>
+</div>
+</div>
+Breaking this down, we’re only going to show our errors if the form is invalid and changed, just as
+before. This time, we’ll look through each of the valiations and only show a particular DOM element
+if the particular validation property is invalid.
+Let’s look at the next set of validations, the email validation:
+<div class="row">
+<div class="large-12 columns">
+<label>Your email</label>
+<input type="email"
+placeholder="Email"
+name="email"
+ng-model="signup.email"
+ng-minlength=3 ng-maxlength=20 required />
+<div class="error"
+ng-show="signup_form.email.$dirty && signup_form.email.$invalid">
+<small class="error"
+ng-show="signup_form.email.$error.required">
+Your email is required.
+</small>
+<small class="error"
+ng-show="signup_form.email.$error.minlength">
+Your email is required to be at least 3 characters
+</small>
+<small class="error"
+ng-show="signup_form.email.$error.email">
+That is not a valid email. Please input a valid email.
+</small>
+
+<small class="error"
+ng-show="signup_form.email.$error.maxlength">
+Your email cannot be longer than 20 characters
+</small>
+</div>
+</div>
+</div>
+This time (with the entire form included), we’re looking at the email field. Note that we set the type
+of the input field to email and added a validation error on $error.email. This validation is based
+off the AngularJS email validation (and the HTML5 attribute).
+Finally, let’s look at our last input field, the username:
+<div class="large-12 columns">
+<label>Username</label>
+<input type="text"
+placeholder="Desired username"
+name="username"
+ng-model="signup.username"
+ng-minlength=3
+ng-maxlength=20
+ensure-unique="username" required />
+<div class="error"
+ng-show="signup_form.username.$dirty && signup_form.username.$invalid">
+<small class="error"
+ng-show="signup_form.username.$error.required">
+Please input a username
+</small>
+<small class="error"
+ng-show="signup_form.username.$error.minlength">
+Your username is required to be at least 3 characters
+</small>
+<small class="error"
+ng-show="signup_form.username.$error.maxlength">
+Your username cannot be longer than 20 characters
+</small>
+<small class="error"
+ng-show="signup_form.username.$error.unique">
+That username is taken, please try another
+</small>
+</div>
+</div>
+
+In our last field, we’re using all the same validations as previously except that we’ve added a custom
+validation. This custom validation is defined using an AngularJS directive:
+app.directive('ensureUnique', function($http) {
+return {
+require: 'ngModel',
+link: function(scope, ele, attrs, c) {
+scope.$watch(attrs.ngModel, function(n) {
+if (!n) return;
+$http({
+method: 'POST',
+url: '/api/check/'+attrs.ensureUnique,
+data: {'field': attrs.ensureUnique}
+}).success(function(data) {
+c.$setValidity('unique', data.isUnique);
+}).error(function(data) {
+c.$setValidity('unique', false);
+});
+});
+}
+}
+});
+When the form input is valid, this will make a POST request check to the server at /api/check/username
+to check if the username is available. Now, obviously since we’re only talking about front-end code
+here, we don’t have a back end to test this on, although it could easily be written.
+Lastly, putting our button together, we can use the Angular directive ng-disabled to disable and
+re-enable the button depending on the validity of the form:
+<button type="submit"
+ng-disabled="signup_form.$invalid"
+class="button radius">Submit</button>
+Play with the example so far²³
+As we said above, the form itself will have $invalid and valid attributes given to us for free.
+Although live validation is great, it can be abrasive to the user when they see errors pop up while
+they are typing, long before they have put in a valid value. You can be nicer to your users if you
+show the validations either only after they have submitted the form or after they have moved off of
+the input. Let’s look at both ways to do that.
+
+
+Show Validations after Submit
+To show validations only after the user has attempted to submit the form, you can capture a
+‘submitted’ value on the scope and check for that scope to show the error.
+For instance, let’s take a look at the first example and only show the errors when our user has
+submitted the form. On the ng-show directive on the form input, we can add a check to see if the
+form has been submitted (which we will implement shortly):
+<form name="signup_form" novalidate
+ng-submit="signupForm()"
+ng-controller="signupController">
+<fieldset>
+<legend>Signup</legend>
+<div class="row">
+<div class="large-12 columns">
+<label>Your name</label>
+<input type="text"
+placeholder="Name"
+name="name"
+ng-model="signup.name"
+ng-minlength=3
+ng-maxlength=20 required />
+<div class="error"
+ng-show="signup_form.name.$dirty && signup_form.name.$invalid &&
+signup_form.submitted">
+<small class="error"
+ng-show="signup_form.name.$error.required">
+Your name is required.
+</small>
+<small class="error"
+ng-show="signup_form.name.$error.minlength">
+Your name is required to be at
+least 3 characters
+</small>
+<small class="error"
+ng-show="signup_form.name.$error.maxlength">
+Your name cannot be longer than
+20 characters
+</small>
+</div>
+</div>
+</div>
+
+<button type="submit" >Submit</button>
+</fieldset>
+</form>
+Now, the error div will only show up if the signup_form.submitted variable has been set to true.
+We can implement this behavior in the signupForm action, like so:
+app.controller('signupController',
+function($scope) {
+$scope.submitted = false; $scope.signupForm = function() { if ($scope.signup_form.$valid) { // Submit
+as normal } else { $scope.signup_form.submitted = true; } }
+});
+If our users try to submit the form while there is an invalid element, we can now catch it and show
+them the appropriate errors.
+Try it out²⁴
+Show Validations Only after Blur
+If we want to retain the real-time nature of the error input, we can show our users the errors after
+they have blurred off of the input form (i.e., when they are no longer in a given field). To do so, we
+like to add a small directive that will attach a new variable to the form.
+The directive we like to use is the ngFocus directive, and it looks like:
+app.directive('ngFocus', [function() {
+var FOCUS_CLASS = "ng-focused";
+return {
+restrict: 'A',
+require: 'ngModel',
+link: function(scope, element, attrs, ctrl) {
+ctrl.$focused = false;
+element.bind('focus', function(evt) {
+element.addClass(FOCUS_CLASS);
+scope.$apply(function() {
+ctrl.$focused = true;
+});
+}).bind('blur', function(evt) {
+
+
+element.removeClass(FOCUS_CLASS);
+scope.$apply(function() {
+ctrl.$focused = false;
+});
+});
+}
+}
+}]);
+To implement the ngFocus directive, we can simply attach this directive to the input element, like
+so:
+<input ng-class="{
+error: signup_form.name.$dirty &&
+signup_form.name.$invalid}"
+type="text"
+placeholder="Name"
+name="name"
+ng-model="signup.name"
+ng-minlength=3
+ng-maxlength=20 required ng-focus />
+The ngFocus directive simply attaches an action to the blur and focus events on the form input,
+adds a class (ng-focused), and sets the form input field, $focused, as true. Then we can show our
+individual error messages depending on whether or not the form is focused. For instance:
+<div class="error"
+ng-show="signup_form.name.$dirty &&
+signup_form.name.$invalid &&
+!signup_form.name.$focused">
+Play with the full example²⁵
+It’s possible to check to see if the input field is empty, as well, by using the $isEmpty() method on
+the ngModel controller. The method will return true if the input is empty and false if it’s not.

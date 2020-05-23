@@ -1,0 +1,77 @@
+﻿Controllers in AngularJS exist to augment the view of an AngularJS application. 
+The controller in AngularJS is a function that adds additional functionality to the scope of the view.
+We use it to set up an initial state and to add custom behavior to the scope object.
+When we create a new controller on a page, Angular passes it a new $scope. This new $scope is
+where we can set up the initial state of the scope on our controller. Since Angular takes care of
+handling the controller for us, we only need to write the constructor function.
+Setting up an initial controller looks like this:
+	function FirstController($scope) {
+	$scope.message = "hello";
+	}
+It is considered a best-practice to name our controllers as [Name]Controller, rather than
+[Name]Ctrl.
+As we can see, Angular will call the controller method when it creates the scope.
+The observant reader will notice we created this function in the global scope. Doing so is usually
+poor form, as we don’t want to dirty the global namespace. To create it more properly, we’ll create
+a module and then create the controller atop our module, like so:
+	var app = angular.module('app', []);
+	app.controller('FirstController', function($scope) {
+	$scope.message = "hello";
+	});
+To create custom actions we can call in our views, we can simply create functions on the scope of
+the controller. Luckily for us, AngularJS allows our views to call functions on the $scope, just as if
+we were calling data.
+To bind buttons or links (or any DOM element, really), we’ll use another built-in directive, ng-click.
+The ng-click directive binds the mouseup browser click event to the method handler, which calls
+the method specified on the DOM element (i.e., when the browser fires a click event on the DOM
+element, the method is called). Similar to our previous example, the binding looks like:
+
+	<div ng-controller="FirstController">
+	<h4>The simplest adding machine ever</h4>
+	<button ng-click="add(1)" class="button">Add</button>
+	<a ng-click="subtract(1)" class="button alert">Subtract</a>
+	<h4>Current count: {{ counter }}</h4>
+	</div>
+Both the button and the link are bound to an action on the containing $scope, so when they are
+pressed (clicked), Angular calls the method. Note that when we tell Angular what method to call,
+we’re putting it in a string with the parentheses (add(1)).
+Now, let’s create an action on our FirstController.
+	app.controller('FirstController', function($scope) {
+	$scope.counter = 0;
+	$scope.add = function(amount) { $scope.counter += amount; };
+	$scope.subtract = function(amount) { $scope.counter -= amount; };
+	});
+Setting our FirstController in this manner allows us to call add or subtract functions (as we’ve
+seen above) that are defined on the FirstController scope or a containing parent $scope.
+Using controllers allows us to contain the logic of a single view in a single container. It’s good
+practice to keep slim controllers. One way that we as AngularJS developers can do so is by using the
+dependency injection feature of AngularJS to access services.
+One major distinction between AngularJS and other JavaScript frameworks is that the controller is
+not the appropriate place to do any DOM manipulation or formatting, data manipulation, or state
+maintenance beyond holding the model data. It is simply the glue between the view and the $scope
+model.
+AngularJS also makes it possible to set any types on the $scope, including objects and show the
+object’s properties in the view.
+For example, we will simply create a person object on the controller MyController that has a single
+attribute of name:
+	app.controller('MyController', function($scope) {
+	$scope.person = {
+	name: "Ari Lerner"
+	};
+	});
+We can access this person object in any child element of the div where ng-controller='MyController'
+is written because it is on the $scope.
+For instance, now we can simply reference person or person.name in our view.
+
+	<div ng-app="myApp">
+	<div ng-controller="MyController">
+	<h1>{{ person }}</h1>
+	and their name:
+	<h2>{{ person.name }}</h2>
+	</div>
+	</div>
+Controller object
+As we can see, the $scope object is how we pass along information from the model to the view. It is
+also how we set up watch events, interact with other parts of the application, and create application 
+specific logic.
+Angular uses scopes to isolate the functionality of the view, controllers, and directives.

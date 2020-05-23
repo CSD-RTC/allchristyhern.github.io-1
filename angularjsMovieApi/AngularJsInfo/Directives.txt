@@ -1,0 +1,793 @@
+﻿As web developers, we’re all familiar with HTML. Let’s take a moment to review and synchronize
+our terminology around this most fundamental of web technologies.
+HTML Document
+An HTML document is a plain text document that contains structure and may be styled through
+CSS or manipulated with JavaScript.
+HTML Node
+An HTML node is an element or chunk of text nested inside another element. All elements are also
+nodes; however, a text node is not an element.
+HTML Element
+An element comprises an opening tag and a closing tag.
+HTML Tag
+An HTML tag is responsible for marking the beginning and end of an element. A tag itself is declared
+using angle brackets.
+An opening tag contains a name that becomes the name of the element. It can also contain attributes,
+which decorate the element.
+Attributes
+To provide additional information about an element, HTML elements can contain attributes. These
+attributes are always set in the opening tag. We can set them in a key-value pair, like key="value",
+or as only a key.
+Let’s take a look at the <a> hyperlink tag, which is used to create a link from one page to another:
+Some tags, like the hyperlink tag, have special attributes that act much like arguments to the tag.
+For example, the href attribute of a link tag enables the behavior of the link tag and also turns the
+text node in between the opening and closing tags blue by default on all browsers.
+<a href="http://google.com">
+Click me to go to Google</a>
+The <a> tag defines a link between another page on our site or off our site, depending on the contents
+of the href attribute, which defines the link’s destination.
+It is noticeably different from the following HTML element, the button:
+<button href="http://google.com"
+type="submit">Click me</button>
+The link tag is, by default, underlined and blue, while the button, by default, looks like a clickable
+button in our browser.
+The link tag knows that, when provided an href attribute that points to http://google.com, it
+should change the URL in the address bar and load Google’s home page when a user clicks on the
+link.
+The button tag, on the other hand, is completely oblivious when provided an href attribute and does
+not perform the same behavior (the attribute is ignored).
+Thus, changing the URL in the address bar and bringing you to a new page is part of a link’s preprogrammed behavior, but not part of a button’s pre-programmed behavior.
+Finally, both tags perform the same behavior when provided a title attribute: They provide a tooltip
+to the user upon hover.
+<a href="http://google.com"
+title="click me">
+Click me to go to Google
+</a>
+<button type="submit"
+title="click me">Click me</button>
+In summary, the web browser renders our HTML elements’ style and behavior; this capability is one
+of the fundamental strengths of the web.
+Each vendor, whether it be Google or Microsoft, tries to adhere to the same HTML spec, therefore
+making programming for the web consistent across devices and operating systems.
+Past versions of Internet Explorer have not complied with the common HTML spec, so
+we need to perform some tricks to get older versions of IE to work. See the Internet
+Explorer chapter for more details.
+Recently, new HTML tags have begun to emerge. These are a part of the HTML5 spec. For example,
+the video tag, which specifies a video, movie clip, or streaming video:
+<video href="/goofy-video.mp4"></video>
+These new HTML5 tags work on on newer browsers and are generally not supported by Internet
+Explorer version 8 and lower.Built-In Directives
+Angular provides a suite of built-in directives. Some directives override built-in HTML elements,
+such the the <form> and <a> tags. When we use tags in our HTML, it may not be immediately
+obvious that we are, in fact, using a directive.
+For example, the <form> tag is augmented with a great deal of functionality under the hood, such
+as validation behavior that we normally don’t get with a standard HTML form.
+Other built-in directives are clearly visible via their ng- namespace prefix. For example, ng-href,
+which we’ll cover below, prevents a link from becoming active until the expression provided to
+ng-href="someExpression" has been evaluated and returns a value.
+Lastly, some built-in directives do not have an HTML counterpart, such as the ng-controller
+directive, which can be used as an attribute on any tag, but is most often found on an element
+that has many children that should share the same scope.
+Note that all directives prefixed with the ng namespace are part of the built-in library of directives
+that ship with Angular. For this reason, never prefix directives you make with this namespace.
+Basic ng Attribute Directives
+Our first set of directives has similarly named standard HTML tags and is easy to remember because
+we simply add the ng prefix to each:
+• ng-href
+• ng-src
+• ng-disabled
+• ng-checked
+• ng-readonly
+• ng-selected
+• ng-class
+• ng-style
+Boolean Attributes
+The following Angular directives help make working with HTML boolean attributes easier.
+Built-In Directives 80
+As defined by the HTML specification³¹, a boolean attribute is an attribute that represents a true/false
+value. When the attribute is present, then the attribute’s value is assumed to be true (regardless of
+its actual value). If absent, the attribute is assumed to be false.
+When working with dynamic data via data bindings in Angular, we cannot simply set the value of
+the attribute to true or false, because by definition of the spec, the attribute is false if it is not present.
+Thus Angular provides an ng-prefixed version of these attributes that will evaluate the expression
+provided to insert or remove the corresponding boolean attribute on the decorated element.
+ng-disabled
+Use ng-disabled to bind the disabled attribute to form input fields:
+• <input> (text, checkbox, radio, number, url, email, submit)
+• <textarea>
+• <select>
+• <button>
+When writing normal HTML input fields, the presence of the disabled attribute on an input field
+makes the field disabled. To bind the presence (or not) of this attribute, use ng-disabled.
+For example, let’s disable the following button until the user enters text into the text field:
+<input type="text" ng-model="someProperty" placeholder="Type to Enable">
+<button ng-model="button" ng-disabled="!someProperty">A Button</button>
+In the next example, we’ll disable the text field for five seconds until the isDisabled property
+becomes true inside the $timeout:
+<textarea ng-disabled="isDisabled">Wait 5 seconds</textarea>
+angular.module('myApp', [])
+.run(function($rootScope, $timeout) {
+$rootScope.isDisabled = true;
+$timeout(function() {
+$rootScope.isDisabled = false;
+}, 5000);
+});
+});
+Live Examples
+http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#boolean-attribute
+http://jsbin.com/iHiYItu/1/edit
+
+ng-readonly
+Similar to the other boolean attributes, the HTML spec only looks at the presence of the attribute
+readonly, not its value.
+To allow Angular to bind to an expression that returns a truthy or falsy value and, in turn, output
+(or not) the readonly attribute, use ng-readonly:
+Type here to make sibling readonly:
+<input type="text" ng-model="someProperty"><br/>
+<input type="text"
+ng-readonly="someProperty"
+value="Some text here"/>
+
+ng-checked
+The standard checked HTML attribute is a boolean attribute, and as such, is not required to take a
+value. In order for Angular to bind the presence of the checked attribute to the value of an expression,
+use ng-checked.
+In the following example, we set the value of someProperty to true using the ng-init directive.
+Binding the value of someProperty to ng-checked then tells Angular to output the standard HTML
+checked attribute, which will check the box by default.
+<label>someProperty = {{someProperty}}</label>
+<input type="checkbox"
+ng-checked="someProperty"
+ng-init="someProperty = true"
+ng-model="someProperty">
+In this example, we do the opposite:
+<label>anotherProperty = {{anotherProperty}}</label>
+<input type="checkbox"
+ng-checked="anotherProperty"
+ng-init="anotherProperty = false"
+ng-model="anotherProperty">
+Note that we also used ng-model to bind the value of someProperty and anotherProperty inside
+their respective label tags, for the sake of demonstration.
+Live Examples
+http://jsbin.com/etIviKI/1/edit
+http://jsbin.com/IXOLIRA/1/edit
+
+ng-selected
+Use ng-selected to bind the presence (or not) of the selected attribute to the option tag:
+<label>Select Two Fish:</label>
+<input type="checkbox"
+ng-model="isTwoFish"><br/>
+<select>
+<option>One Fish</option>
+<option ng-selected="isTwoFish">Two Fish</option>
+</select>
+Live Example³⁵
+Boolean-like Attributes
+While not technically HTML, boolean attributes like the ng-href and ng-src act in a similar manner
+and are therefore defined alongside the ng boolean attributes within the Angular source code and
+presented here.
+Both ng-href and ng-src are so likely to help improve refactoring and prevent errors when changing
+code later in a project that it is recommended to use them in place of href and src, respectively.
+ng-href
+When dynamically creating a URL from a property on the current scope, always use ng-href instead
+of href.
+The issue here is that the user is able to click a link built with href before interpolation takes place,
+which would bring them to the wrong page (often a 404).
+On the other hand, by using ng-href, Angular waits for the interpolation to take place (in our
+example, after two seconds), and then activates the link’s behavior:
+<!-- Always use ng-href when href includes an {{ expression }} -->
+<a ng-href="{{myHref}}">I'm feeling lucky, when I load</a>
+<!-- href may not load before user clicks -->
+<a href="{{myHref}}">I'm feeling 404</a>
+Delay the interpolation of the string value for two seconds to see this behavior in action:
+³⁵http://jsbin.com/oQazOQE/2/edit
+Built-In Directives 83
+angular.module('myApp', [])
+.run(function($rootScope, $timeout) {
+$timeout(function() {
+$rootScope.myHref = 'http://google.com';
+}, 2000);
+});
+Live Example³⁶
+ng-src
+Angular will tell the browser to NOT fetch the image via the given URL until all expressions provided
+to ng-src have been interpolated:
+<h1>Wrong Way</h1>
+<img src="{{imgSrc}}" />
+<h1>Right way</h1>
+<img ng-src="{{imgSrc}}" />
+angular.module('myApp', [])
+.run(function($rootScope, $timeout) {
+$timeout(function() {
+$rootScope.imgSrc = 'https://www.google.com/images/srpr/logo11w.png';
+}, 2000);
+});
+Live Example³⁷
+When viewing the live example, check out the network panel within the Chrome developer tools.
+Notice that one request is red, indicating that there was an error. This error occurs when we use src
+instead of ng-src under ‘Wrong Way’.
+Directives with Child Scope
+The following directives create a child scope that prototypically inherits from its parent. This
+inheritance provides a layer of separation meant for storing methods and model objects that work
+together to achieve a common goal.
+³⁶http://jsbin.com/IgInopi/1/edit
+³⁷http://jsbin.com/egucIqU/1/edit
+Built-In Directives 84
+ng-app and ng-controller are special directives, in that they modify the scope of directives nested
+inside of them.
+ng-app creates the $rootScope of an Angular application, while ng-controller creates a child scope
+that prototypically inherits from either $rootScope or another ng-controller’s $scope.
+ng-app
+Placing ng-app on any DOM element marks that element as the beginning of the $rootScope.
+$rootScope is the beginning of the scope chain, and all directives nested under the ng-app in your
+HTML inherit from it.
+In your JavaScript code you can access the $rootScope via the run method:
+<html ng-app="myApp">
+<body>
+{{ someProperty }}
+<button ng-click="someAction()"></button>
+</body>
+</html>
+angular.module('myApp', [])
+.run(function($rootScope) {
+$rootScope.someProperty = 'hello computer';
+$rootScope.someAction = function() {
+$rootScope.someProperty = 'hello human';
+};
+});
+Live Example³⁸
+While useful for the purpose of demonstration, using $rootScope on a regular basis is like using
+global scope – don’t do it.
+We can only use ng-app once per document. If we want to place multiple apps in a page, we’ll need
+to manually bootstrap our applications. We will talk more about manually bootstrapping apps in
+the under the hood chapter.
+ng-controller
+Instead of defining actions and models on $rootScope, use ng-controller, which is a built-in
+directive whose purpose is to provide a child scopes for the directives that are nested inside. We’ll
+use this directive to place a controller on a DOM element.
+ng-controller takes a single argument:
+³⁸http://jsbin.com/ICOzeFI/2/edit
+Built-In Directives 85
+expression (required expression)
+The expression is an Angular expression
+A child $scope is simply a JavaScript object that prototypically inherits methods and properties from
+its parent $scope(s), including the application’s $rootScope.
+Directives that are nested within an ng-controller have access to this new child $scope, but be
+mindful that the scoping rules for each directive do apply.
+Recall that the $scope object within a controller should be responsible for the actions and models
+shared by directives in the DOM.
+An action refers to a traditional JavaScript method on the $scope object.
+A model refers to a traditional JavaScript object {} where transient state should be stored.
+Persistent state should be bound to a service, which is then responsible for dealing with
+persisting that model.
+It’s important to not to set a value object (string, boolean, or number) directly on the
+$scope of a controller for a number of technological and architectural reasons. Data in the
+DOM should always use a . (dot). Following this rule will keep you out of unexpected
+trouble.
+Controllers should be as simple as possible. Although we can use the controller to prototype
+our functionality, it’s a good idea to refactor the logic out using services and directives. See
+application architecture for more information.
+Using a controller, we can modify our previous example by placing our data and action on a child
+scope:
+<div ng-controller="SomeController">
+{{ someModel.someProperty }}
+<button ng-click="someAction()">Communicate</button>
+</div>
+Built-In Directives 86
+angular.module('myApp', [])
+.controller('SomeController', function($scope) {
+// create a model
+$scope.someModel = {
+// with a property
+someProperty: 'hello computer'
+}
+// set actions on $scope itself
+$scope.someAction = function() {
+$scope.someModel.someProperty = 'hello human';
+};
+});
+Live Example³⁹
+In this iteration of our example, notice two differences from the previous:
+First, we’re using a child scope of $rootScope, which provides a clean object with which we can
+work. Using this scope means that actions and models used on the scope will not be available
+everywhere in the app; they’ll only be available to directives within this scope or child scopes.
+Secondly, notice that we’re explicit about our data model, which, as we mentioned, is extremely
+important. To see why it is important, let’s look at another iteration of this example that nests a
+second controller inside of our existing controller and doesn’t set properties on a model object:
+<div ng-controller="SomeController">
+{{ someBareValue }}
+<button ng-click="someAction()">Communicate to child</button>
+<div ng-controller="ChildController">
+{{ someBareValue }}
+<button ng-click="childAction()">Communicate to parent</button>
+</div>
+</div>
+³⁹http://jsbin.com/OYikipe/1/edit
+Built-In Directives 87
+angular.module('myApp', [])
+.controller('SomeController', function($scope) {
+// anti-pattern, bare value
+$scope.someBareValue = 'hello computer';
+// set actions on $scope itself, this is okay
+$scope.someAction = function() {
+// sets {{ someBareValue }} inside SomeController and ChildController
+$scope.someBareValue = 'hello human, from parent';
+};
+})
+.controller('ChildController', function($scope) {
+$scope.childAction = function() {
+// sets {{ someBareValue }} inside ChildController
+$scope.someBareValue = 'hello human, from child';
+};
+});
+Live Example⁴⁰
+Because of the way prototypal inheritance works with value objects in JavaScript, changing
+someBareValue via an action in the parent does change it in the child, but not vice versa.
+To see this problem in action, try clicking on the child button first and then the parent button. Doing
+so makes it clear that the child controller has copy, not a reference to someBareValue.
+JavaScript objects are either copy by value or copy by reference. String, Number, and
+Boolean are copy by value. Array, Object, and Function are copy by reference.
+Had we set our string as a property on a model object, it would have been shared via reference, which
+means changing the property on the child will change it on the parent. The following example shows
+the correct way:
+<div ng-controller="SomeController">
+{{ someModel.someValue }}
+<button ng-click="someAction()">Communicate to child</button>
+<div ng-controller="ChildController">
+{{ someModel.someValue }}
+<button ng-click="childAction()">Communicate to parent</button>
+</div>
+</div>
+⁴⁰http://jsbin.com/UbIRIHa/1/
+Built-In Directives 88
+angular.module('myApp', [])
+.controller('SomeController', function($scope) {
+// best practice, always use a model
+$scope.someModel = {
+someValue: 'hello computer'
+}
+$scope.someAction = function() {
+$scope.someModel.someValue = 'hello human, from parent';
+};
+})
+.controller('ChildController', function($scope) {
+$scope.childAction = function() {
+$scope.someModel.someValue = 'hello human, from child';
+};
+});
+Live Example⁴¹
+Try clicking on either button. The value always remains in sync.
+Note that while this behavior manifests itself most noticeably when using ng-controller, it will
+also rear its ugly head when using any directive that creates a new child scope by setting the scope
+property inside its directive definition to true. The following built-in directives do exactly that:
+• ng-include
+• ng-switch
+• ng-repeat
+• ng-view
+• ng-controller
+• ng-if
+ng-include
+Use ng-include to fetch, compile, and include an external HTML fragment into your current
+application. The URL of the template is restricted to the same domain and protocol as the application
+document unless whitelisted or wrapped as trusted values. Furthermore, you’ll need to account
+for Cross-Origin Resource Sharing and Same Origin Policy to ensure your template loads on all
+browsers. For example, it won’t work for cross-domain requests on all browsers and for file:// access
+on some browsers.
+While developing, you may run Chrome from the command line with chrome
+--allow-file-access-from-files to disable the CORS error. Only go this route in an
+emergency (e.g., your boss is standing behind you and everything just broke).
+⁴¹http://jsbin.com/afIyeda/1/edit
+Built-In Directives 89
+Use the onload attribute within the same element to run an expression when the template is loaded.
+Keep in mind that when using ng-include, Angular automatically creates a new child scope. If
+you want to use a particular scope, for instance the scope of ControllerA, you must invoke the
+ng-controller="ControllerA" directive on the same DOM element itself; it will not be inherited
+from the surrounding scope like usual because a new scope is created when the template loads.
+Let’s look at an example:
+<div ng-include="/myTemplateName.html"
+ng-controller="MyController"
+ng-init="name = 'World'">
+Hello {{ name }}
+</div>
+ng-switch
+We use this directive in conjunction with ng-switch-when and on="propertyName" to switch which
+directives render in our view when the given propertyName changes. In the following example, when
+person.name is ‘Ari’ the div below the text field will be shown and the person will have won:
+<input type="text" ng-model="person.name" />
+<div ng-switch on="person.name"></div>
+<p ng-switch-default>And the winner is</p>
+<h1 ng-switch-when="Ari">{{ person.name }}</h1>
+Note that we used ng-switch-default to output the name of the person until the switch occured.
+Live Example⁴²
+ng-view
+The ng-view directive sets the view location in the HTML where the router will manage and place
+the view elements for different routes. We will cover this in depth in the routing chapter.
+See the routing chapter for more information.
+ng-if
+Use ng-if to completely remove or recreate an element in the DOM based on an expression. If the
+expression assigned to ng-if evaluates to a false value, then the element is removed from the DOM,
+otherwise a clone of the element is reinserted into the DOM.
+⁴²http://jsbin.com/AVihUdi/2/
+Built-In Directives 90
+ng-if differs from ng-show and ng-hide in that it actually removes and recreates DOM nodes, rather
+than just showing and hiding them via CSS.
+When an element is removed from the DOM using ng-if, its associated scope is destroyed.
+Furthermore, when it comes back into being, a new scope is created and inherits from its parent
+scope using prototypal inheritance.
+It’s also important be aware that ngIf recreates elements using their compiled state. If code inside
+of ng-if is loaded, is manipulated using jQuery (for example, using .addClass), then is removed
+because the expression inside the ng-if becomes false, then when the expression later becomes true
+again, the DOM element and its children will be reinserted into the DOM in their original state,
+not the state they had when they left the DOM. That means that whatever class was added using
+jQuery’s .addClass will no longer be present.
+<div ng-if="2 + 2 === 5">
+Won't see this DOM node, not even in the source code
+</div>
+<div ng-if="2 + 2 === 4">
+Hi, I do exist
+</div>
+Live Example⁴³
+ng-repeat
+Use ng-repeat to iterate over a collection and instantiate a new template for each item in the
+collection. Each item in the collection is given its own template and therefore its own scope.
+Furthermore, there are a number of special properties exposed on the local scope of each template
+instance:
+• $index: iterator offset of the repeated element (0..length-1)
+• $first: true if the repeated element is first in the iterator
+• $middle: true if the repeated element is between the first and last in the iterator
+• $last: true if the repeated element is last in the iterator
+• $even: true if the iterator position $index is even (otherwise false)
+• $odd: true if the iterator position $index is odd (otherwise false)
+We’ll use $odd and $even in the following example to make a repeating list where even items are
+red and odd item are blue. Remember that in JavaScript arrays are indexed starting at 0; thus, we
+use !$even and !$odd to flip the boolean value given by $even and $odd.
+⁴³http://jsbin.com/ezEcamo/1/
+Built-In Directives 91
+<ul ng-controller="PeopleController">
+<li ng-repeat="person in people" ng-class="{even: !$even, odd: !$odd}">
+{{person.name}} lives in {{person.city}}
+</li>
+</ul>
+.odd {
+background-color: blue;
+}
+.even {
+background-color: red;
+}
+angular.module('myApp', [])
+.controller('PeopleController', function($scope) {
+$scope.people = [
+{name: "Ari", city: "San Francisco"},
+{name: "Erik", city: "Seattle"}
+];
+})
+Live Example⁴⁴
+ng-init
+Use ng-init to set up state inside the scope of a directive when that directive is invoked.
+The most common use case for using ng-init is when creating small examples for educational
+purposes, like the examples in this chapter.
+For anything substantial, create a controller and set up state within a model object.
+<div ng-init="greeting='Hello'; person='World'">
+{{greeting}} {{person}}
+</div>
+Live Example⁴⁵
+{{ }}
+⁴⁴http://jsbin.com/akuYUkey/1/edit
+⁴⁵http://jsbin.com/OZENuhO/1/
+Built-In Directives 92
+<div>{{ name }}</div>
+The {{ }} syntax is a templating syntax that’s built into Angular. It creates a binding from the
+containing $scope to the view. Any time that the $scope changes, the view will update automatically
+on account of this binding.
+Although it doesn’t look like a normal directive, it is, in fact, a shortcut for using ng-bind without
+needing to create an element; therefore, it is most commonly used with inline text.
+Be aware that using {{ }} within the visible viewport of the screen while the page loads may cause
+a flash of unrendered content. To prevent this issue, use ng-bind instead.
+<body ng-init="greeting = 'Hello World'">
+{{ greeting }}
+</body>
+Live Example⁴⁶
+ng-bind
+Although we can use the {{ }} template syntax within our views (Angular interpolates these), we
+can mimic this behavior with the ng-bind directive.
+<body ng-init="greeting = 'Hello World'">
+<p ng-bind="greeting"></p>
+</body>
+Live Example⁴⁷
+When we use the {{ }} syntax, our HTML document loads the element and does not render it
+immediately, causing a “flash of unrendered content” (FOUC, for short). We can prevent this FOUC
+from being exposed by using ng-bind and binding our content to the element. The content will then
+render as the child text node of the element on which ng-bind is declared.
+ng-cloak
+An alternative to using to using ng-bind to prevent a flash of unrendered content is to use ng-cloak
+on the element containing {{ }}:
+⁴⁶http://jsbin.com/ODUxeho/1/edit
+⁴⁷http://jsbin.com/esihUJ/1/edit
+Built-In Directives 93
+<body ng-init="greeting = 'Hello World'">
+<p ng-cloak>{{ greeting }}</p>
+</body>
+Live Example⁴⁸
+ng-bind-template
+Similar to the ng-bind directive, we can use the ng-bind-template directive if we want to bind
+multiple expressions to the view.
+<div
+ng-bind-template="{{ message }} {{ name }}">
+</div>
+ng-model
+The ng-model directive binds an input, select, textarea, or custom form control to a property on
+the surrounding scope. It handles and provides validation, sets related CSS classes on the element
+(ng-valid, ng-invalid, etc.), and registers the control with its parent form.
+It binds to the property given by evaluating the expression on the current scope. If the property
+doesn’t already exist on this scope, it will be created implicitly and added to the scope.
+We should always use ngModel with a model property on the $scope, not as a raw property on the
+scope itself. Setting ng-model as a property of the scope will help us avoid overloading properties
+on the same scope or the inherited scope.
+For example:
+<input type="text"
+ng-model="modelName.someProperty" />
+The code above is the correct way to think about and practically use ngModel properly.
+The bottom line is to always have a . in your ng-models. For in-depth discussion and an example
+on this topic, see the ng-controller section earlier in this chapter.
+⁴⁸http://jsbin.com/AJEboLO/1/edit
+Built-In Directives 94
+ng-show/ng-hide
+ng-show and ng-hide show or hide the given HTML element based on the expression provided to
+the attribute. When the expression provided to the ng-show attribute is false the element is hidden.
+Similarly, when the expression given to ng-hide is true, the element is hidden.
+The element is shown or hidden by removing the ng-hide CSS class from, or adding it to, the element.
+The .ng-hide CSS class is predefined in AngularJS and sets the display style to none (using an
+!important flag).
+<div ng-show="2 + 2 == 5">
+2 + 2 isn't 5, don't show
+</div>
+<div ng-show="2 + 2 == 4">
+2 + 2 is 4, do show
+</div>
+<div ng-hide="2 + 2 == 5">
+2 + 2 isn't 5, don't hide
+</div>
+<div ng-hide="2 + 2 == 4">
+2 + 2 isn't 5, do hide
+</div>
+Live Example⁴⁹
+ng-change
+This directive evaluates the given expression when the input changes. As we’re dealing with input,
+we must use this directive in conjunction with ngModel.
+<div ng-controller="EquationController">
+<input type="text"
+ng-model="equation.x"
+ng-change="change()" />
+<code>{{ equation.output }}</code>
+</div>
+⁴⁹http://jsbin.com/ihOkagE/1/
+Built-In Directives 95
+angular.module('myApp', [])
+.controller('EquationController', function($scope) {
+$scope.equation = {};
+$scope.change = function() {
+$scope.equation.output
+= Number($scope.equation.x) + 2;
+};
+});
+Live Example⁵⁰
+In the above example, we run the change() function whenever equation.x is changed by entering
+text into the text field.
+ng-form
+We use ng-form when we need to nest a form within another form. The normal HTML <form> tag
+doesn’t allow us to nest our forms, but ng-form will.
+That means that the outer form is valid when all of the child forms are valid, as well. This fact is
+especially useful when dynamically generating forms using ng-repeat.
+Because we cannot dynamically generate the name attribute of input elements using interpolation,
+we need to wrap each set of repeated inputs in an ng-form directive and nest these in an outer form
+element.
+The following CSS classes are set automatically, depending on the validity of the form:
+• ng-valid when form is valid
+• ng-invalid when form is invalid
+• ng-pristine when form is pristine
+• ng-dirty when form is dirty
+Angular will not submit the form to the server unless the form has an action attribute specified.
+To specify which JavaScript method should be called when a form is submitted, use one of the
+following two directives:
+• ng-submit on the form element
+• ng-click on the first button or input field of type submit (input[type=submit])
+⁵⁰http://jsbin.com/onUXuxO/1/edit
+Built-In Directives 96
+To prevent double execution of the handler, use only the ng-submit or ng-click directives.
+In the following examples, we want to dynamically generate a form based on a JSON response
+from the server. We’ll use ng-repeat to loop over the fields we get back from the server. Because
+we cannot dynamically generate the name attribute, and because we need the name attribute to
+perform validation, we’ll loop over the fields and create a new form for each one.
+Because Angular forms that use ng-form instead of form can be nested, and because the parent form
+is not valid until its child forms are valid, we can both dynamically generate a form with child forms
+and use validation. Yes, we can have our cake and eat it too.
+Let’s first view the JSON we’re hard coding, as though it came from the server:
+angular.module('myApp', [])
+.controller('FormController', function($scope) {
+$scope.fields = [
+{placeholder: 'Username', isRequired: true},
+{placeholder: 'Password', isRequired: true},
+{placeholder: 'Email (optional)', isRequired: false}
+];
+$scope.submitForm = function() {
+alert("it works!");
+};
+});
+Now, let’s take a look at using that data to generate a dynamic form with validation:
+<form name="signup_form"
+ng-controller="FormController"
+ng-submit="submitForm()" novalidate>
+<div ng-repeat="field in fields"
+ng-form="signup_form_input">
+<input type="text"
+name="dynamic_input"
+ng-required="field.isRequired"
+ng-model="field.name"
+placeholder="{{field.placeholder}}" />
+<div
+ng-show="signup_form_input.dynamic_input.$dirty &&
+signup_form_input.dynamic_input.$invalid">
+<span class="error"
+ng-show="signup_form_input.dynamic_input.$error.required">
+The field is required.
+Built-In Directives 97
+</span>
+</div>
+</div>
+<button type="submit"
+ng-disabled="signup_form.$invalid">
+Submit All
+</button>
+</form>
+input.ng-invalid {
+border: 1px solid red;
+}
+input.ng-valid {
+border: 1px solid green;
+}
+Live Example⁵¹
+ng-click
+Use ng-click to specify a method or expression to run on the containing scope when the element
+is clicked.
+<div ng-controller="CounterController">
+<button ng-click="count = count + 1"
+ng-init="count=0">
+Increment
+</button>
+count: {{count}}
+<button ng-click="decrement()">
+Decrement
+</button>
+<div>
+⁵¹http://jsbin.com/UduNeCA/1/edit
+Built-In Directives 98
+angular.module('myApp', [])
+.controller('CounterController', function($scope) {
+$scope.decrement = function() {
+$scope.count = $scope.count - 1;
+};
+})
+Live Example⁵²
+ng-select
+Use the ng-select directive to bind data to an HTML <select> element. This directive can be
+used in conjunction with ng-model and ng-options to provide sophisticated and highly performant
+dynamic forms.
+ng-options takes a comprehension expression for its attribute value, which is just a fancy way of
+saying it can take an array or an object and loop over its contents to provide the options available
+when using the select tag. It comes in one of the following forms:
+• for array data sources:
+– label for value in array
+– select as label for value in array
+– label group by group for value in array
+– select as label group by group for value in array track by trackexpr
+• for object data sources:
+– label for (key, value) in object
+– select as label for (key, value) in object
+– label group by group for (key, value) in object
+– select as label group by group for (key, value) in object
+Let’s look at an example of using ng-select:
+<div ng-controller="CityController">
+<select ng-model="city"
+ng-options="city.name for city in cities">
+<option value="">Choose City</option>
+</select>
+Best City: {{ city.name }}
+</div>
+⁵²http://jsbin.com/uGipUBU/2/edit
+Built-In Directives 99
+angular.module('myApp', [])
+.controller('CityController', function($scope) {
+$scope.cities = [
+{name: 'Seattle'},
+{name: 'San Francisco'},
+{name: 'Chicago'},
+{name: 'New York'},
+{name: 'Boston'}
+];
+});
+Live Example⁵³
+ng-submit
+We use ng-submit to bind an expression to an onsubmit event. This directive also prevents the
+default action (sending the request and reloading the page), but only if the form does not contain an
+action attribute.
+<form ng-submit="submit()"
+ng-controller="FormController">
+Enter text and hit enter:
+<input type="text"
+ng-model="person.name"
+name="person.name" />
+<input type="submit"
+name="person.name"
+value="Submit" />
+<code>people={{people}}</code>
+<ul ng-repeat="(index, object) in people">
+<li>{{ object.name }}</li>
+</ul>
+</form>
+⁵³http://jsbin.com/iQelOxi/1/edit
+Built-In Directives 100
+angular.module('myApp', [])
+.controller('FormController', function($scope) {
+$scope.person = {
+name: null
+};
+$scope.people = [];
+$scope.submit = function() {
+if ($scope.person.name) {
+$scope.people.push({name: $scope.person.name});
+$scope.person.name = '';
+}
+};
+});
+Live Example⁵⁴
+ng-class
+Use ng-class to dynamically set the class of an element by binding an expression that represents all
+classes to be added. Duplicate classes will not be added. When the expression changes, the previously
+added classes are removed and only then are the new classes added.
+Let’s use ng-class to add the class .red to a div whenever a random number drawn is above 5.
+<div ng-controller="LotteryController">
+<div ng-class="{red: x > 5}"
+ng-if="x > 5">
+You won!
+</div>
+<button ng-click="x = generateNumber()"
+ng-init="x = 0">
+Draw Number
+</button>
+<p>Number is: {{ x }}</p>
+</div>
+⁵⁴http://jsbin.com/ONIcAC/1/edit
+Built-In Directives 101
+.red {
+background-color: red;
+}
+angular.module('myApp', [])
+.controller('LotteryController', function($scope) {
+$scope.generateNumber = function() {
+return Math.floor((Math.random()*10)+1);
+}
+})
+Check out the Live Example⁵⁵
+ng-attr-(suffix)
+When Angular compiles the DOM, it looks for expressions within {{ some expression }} brackets.
+These expressions are automatically registered with the $watch service and update as part of the
+normal $digest cycle:
+<-- updated when `someExpression` on the $scope
+is updated -->
+<h1>Hello {{ someExpression }}</h1>
+Sometimes, however, web browsers are picky about what attributes they allow. SVG is one such
+instance:
+<svg>
+<circle cx="{{cx}}"></circle>
+</svg>
+Running the code above will throw an error, telling us we have an invalid attribute. To fix this
+problem, we can use ng-attr-cx. Notice that the cx is named after the attribute we would like to
+define. Within the string, we can write an expression with {{ }} and achieve the result we were
+looking for above.
+⁵⁵http://jsbin.com/IvEcUci/1/edit
+Built-In Directives 102
+<svg
+>
+<circle ng-attr-cx="{{cx}}"
+><circle
+>
+</svg>
