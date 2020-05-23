@@ -4,7 +4,7 @@ You can use the [editor on GitHub](https://github.com/allchristyhern/allchristyh
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-###Navigation
+### Navigation
 -    <a href="index.html">AngularJs Movie API: index.html</a>
 
 ### Markdown
