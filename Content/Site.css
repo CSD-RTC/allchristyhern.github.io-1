@@ -1,0 +1,65 @@
+﻿body{
+    padding-top: 40px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/*#region photos*/
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center
+}
+
+.card {
+    width: 200px;
+    margin: 5px;
+    border: 2px solid #ccc;
+    box-shadow: 2px 2px 6px 0px rgba(0,0,0,0.3);
+    padding: 5px 10px 5px 10px;
+}
+
+    .card img {
+        max-width: 100%;
+        background-image: inherit;
+    }
+
+    .card .text {
+        padding: 10px 10px 10px;
+    }
+
+        .card .text > button {
+            background: gray;
+            border: 0;
+            color: white;
+            padding: 10px;
+            width: 100%;
+        }
+/*#endregion*/
+
+.corral-reef-bg {
+    background: url('../Content/Images/giphy.gif') no-repeat;
+    background-size: cover;
+    background-color: transparent;
+}
+
+.carousel-caption-title{
+    font-family:'Lucida Handwriting';
+}
+heavy-text{
+    font-weight:900;
+}
+lg-text{
+    font-size:16px;
+}
