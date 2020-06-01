@@ -6,7 +6,7 @@ Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://j
 
 ### Navigation
 -    <a href="angularjsMovieApi/index.html">AngularJs Movie API: index.html</a>
--    <a href="pages/index.html">Intro to Front End Web Development: Cuttlefish index.html</a>
+-    <a href="Pages/index.html">Intro to Front End Web Development: Cuttlefish index.html</a>
 
 ### Markdown
 
